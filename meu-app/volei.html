@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Vôlei</title>
+  <link rel="stylesheet" href="style2.css">
+</head>
+<body>
+  <div class="centralizado">
+    <h2>Chat Vôlei</h2>
+    <form id="chat-form">
+      <input type="text" id="mensagem" placeholder="Digite sua mensagem" required>
+      <button type="submit">Enviar</button>
+    </form>
+    <div id="mensagens"></div>
+    <button id="btn-historico">Ver histórico</button>
+    <button id="btn-fechar">Fechar</button>
+    <div id="historico" style="display:none;">
+      <h3>Histórico de conversas</h3>
+      <div id="lista-conversas"></div>
+      <button id="btn-voltar">Voltar ao chat</button>
+    </div>
+  </div>
+  <script src="renderer-chats.js"></script>
+</body>
+</html>
