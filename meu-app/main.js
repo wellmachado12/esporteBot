@@ -8,10 +8,10 @@ const bcrypt = require('bcrypt');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'senacrs',
-  database: 'chatbot'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE
 });
 
 db.connect((err) => {
@@ -26,8 +26,8 @@ let mainWindow;
 
 app.whenReady().then(() => {
   mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 800,
+    width: 1200,
+    height: 1000,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -52,8 +52,8 @@ app.on('window-all-closed', () => {
 
 function createWindow(title, file) {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 900,
     title: title,
     parent: mainWindow,
     modal: true,
@@ -117,29 +117,33 @@ ipcMain.handle('abrir-index', () => {
   }
 });
 
-// Manipulador para processar mensagens do chatbot e salvar conversa
-ipcMain.handle('enviar-mensagem', async (event, mensagem, userId, esporte) => {
+// CREATE - Nova mensagem/conversa (com conversation_id)
+ipcMain.handle('enviar-mensagem', async (event, mensagem, userId, esporte, conversationId = null) => {
   try {
+    // Se não veio conversationId, cria um novo (buscando o maior + 1)
+    if (!conversationId) {
+      const [rows] = await db.promise().query('SELECT MAX(conversation_id) as maxId FROM conversations');
+      conversationId = (rows[0].maxId || 0) + 1;
+    }
     const prompt = `Você é um assistente IA especialista em ${esporte}. Responda a pergunta do usuário ${mensagem} de forma clara e objetiva, levando em consideração as informações mais atuais disponibilizadas na internet.`;
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const resposta = await model.generateContent(prompt);
     const respostaTexto = resposta.response.text();
 
-    // Salva a conversa no banco de dados, incluindo o esporte
     db.query(
-      'INSERT INTO conversations (user_id, message, response, sport) VALUES (?, ?, ?, ?)',
-      [userId, mensagem, respostaTexto, esporte]
+      'INSERT INTO conversations (user_id, message, response, sport, conversation_id) VALUES (?, ?, ?, ?, ?)',
+      [userId, mensagem, respostaTexto, esporte, conversationId]
     );
 
-    return respostaTexto;
+    return { respostaTexto, conversationId };
   } catch (error) {
     console.error('Erro ao gerar resposta:', error.message || error);
-    return 'Desculpe, ocorreu um erro ao processar sua mensagem.';
+    return { respostaTexto: 'Desculpe, ocorreu um erro ao processar sua mensagem.', conversationId: null };
   }
 });
 
-// Buscar conversas do usuário (opcionalmente filtrando por esporte)
-ipcMain.handle('get-conversations', async (event, userId, esporte = null) => {
+// READ - Buscar conversas agrupadas por conversation_id
+ipcMain.handle('get-conversations-grouped', async (event, userId, esporte = null) => {
   return new Promise((resolve) => {
     let sql = 'SELECT * FROM conversations WHERE user_id = ?';
     let params = [userId];
@@ -147,12 +151,48 @@ ipcMain.handle('get-conversations', async (event, userId, esporte = null) => {
       sql += ' AND sport = ?';
       params.push(esporte);
     }
-    sql += ' ORDER BY timestamp DESC';
+    sql += ' ORDER BY conversation_id DESC, timestamp ASC';
     db.query(sql, params, (err, results) => {
-      if (err) resolve([]);
-      else resolve(results);
+      if (err) return resolve([]);
+      // Agrupa por conversation_id
+      const grouped = {};
+      results.forEach(conv => {
+        if (!grouped[conv.conversation_id]) grouped[conv.conversation_id] = [];
+        grouped[conv.conversation_id].push(conv);
+      });
+      resolve(grouped);
     });
-  })
+  });
+});
+
+// DELETE - Apagar conversa (por id individual)
+ipcMain.handle('apagar-conversa', async (event, id) => {
+  return new Promise((resolve) => {
+    db.query('DELETE FROM conversations WHERE id = ?', [id], (err, result) => {
+      if (err) resolve(false);
+      else resolve(true);
+    });
+  });
+});
+
+// DELETE - Apagar conversa inteira (por conversation_id)
+ipcMain.handle('apagar-thread', async (event, conversationId) => {
+  return new Promise((resolve) => {
+    db.query('DELETE FROM conversations WHERE conversation_id = ?', [conversationId], (err, result) => {
+      if (err) resolve(false);
+      else resolve(true);
+    });
+  });
+});
+
+// UPDATE - Atualizar mensagem da conversa
+ipcMain.handle('atualizar-conversa', async (event, id, novaMensagem) => {
+  return new Promise((resolve) => {
+    db.query('UPDATE conversations SET message = ? WHERE id = ?', [novaMensagem, id], (err, result) => {
+      if (err) resolve(false);
+      else resolve(true);
+    });
+  });
 });
 
 ipcMain.handle('abrir-login', () => {
