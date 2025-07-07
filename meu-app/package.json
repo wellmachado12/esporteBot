@@ -4,7 +4,12 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "knex migrate:latest",
+    "migrate:rollback": "knex migrate:rollback",
+    "migrate:make": "knex migrate:make",
+    "seed": "knex seed:run",
+    "seed:make": "knex seed:make"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +19,10 @@
     "@google/generative-ai": "^0.24.1",
     "bcrypt": "^6.0.0",
     "dotenv": "^16.5.0",
+    "knex": "^3.1.0",
     "mysql2": "^3.14.1"
+  },
+  "devDependencies": {
+    "electron": "^37.2.0"
   }
 }
