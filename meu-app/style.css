@@ -1,0 +1,140 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f8ff;
+    /* Azul claro */
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+button {
+    display: block;
+    width: 200px;
+    margin: 10px auto;
+    padding: 10px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    /* Azul */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+    /* Azul mais escuro */
+}
+
+button:active {
+    background-color: #003f7f;
+    /* Azul ainda mais escuro */
+}
+
+#chat-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+#chat-messages {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-left: 15px;
+}
+
+#chat-messages div {
+    margin: 5px 0;
+}
+
+#chat-input {
+  width: calc(100% - 110px);
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-right: 10px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+#chat-send {
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+}
+
+#chat-send:hover {
+   background-color: #45a049;
+}
+
+/* Estilo das mensagens do usuário */
+.user-message {
+  background-color: #e1ffc7; /* Cor de fundo verde claro para o usuário */
+  border-radius: 10px;
+  padding: 10px;
+  margin: 5px 0;
+  align-self: flex-start; /* Alinha as mensagens do usuário à esquerda */
+  max-width: 80%;
+  word-wrap: break-word;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Estilo das mensagens do bot */
+.bot-message {
+  background-color: #f1f1f1; /* Cor de fundo cinza claro para o bot */
+  border-radius: 10px;
+  padding: 10px;
+  margin: 5px 0;
+  align-self: flex-end; /* Alinha as mensagens do bot à direita */
+  max-width: 80%;
+  word-wrap: break-word;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animação de fade-in para suavizar a aparição das mensagens */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilo da mensagem de "EsporteBot está digitando..." */
+.loading-message {
+  font-style: italic;
+  color: #888;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Estilo de mensagens de erro */
+.error-message {
+  color: red;
+  text-align: center;
+  font-weight: bold;
+  margin-top: 10px;
+}
