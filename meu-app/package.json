@@ -1,0 +1,33 @@
+{
+  "name": "meu-app",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "knex migrate:latest",
+    "migrate:rollback": "knex migrate:rollback",
+    "migrate:make": "knex migrate:make",
+    "seed": "knex seed:run",
+    "seed:make": "knex seed:make"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Este aplicativo agora utiliza Knex.js como query builder para o banco de dados MySQL.",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^16.5.0",
+    "knex": "^3.1.0",
+    "mysql2": "^3.14.1",
+    "puppeteer": "^24.12.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.1",
+    "electron": "^37.2.0"
+  },
+  "directories": {
+    "example": "examples"
+  }
+}
